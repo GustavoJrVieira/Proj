@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Cores Iguais</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden; /* Evita o scroll horizontal */
+            display: flex; /* Para utilizar flexbox */
+            flex-direction: column; /* Empilhar header, sidebar e main-content verticalmente */
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 20px 40px; /* Aumenta o padding para aumentar a altura verticalmente */
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 23px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #7749F8;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Fixa a barra lateral */
+            height: 100%; /* Ocupa toda a altura da tela */
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #8c68f1;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background-color: #5a37c4;
+        }
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 270px; /* Espaço para a barra lateral fixa */
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            border-radius: 4px;
+            padding: 20px;
+            z-index: 1000; /* Garante que a mensagem seja exibida acima de outros elementos */
+            display: none; /* Começa escondido */
+        }
+
+        /* Game Styles */
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color:  #8a36da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-image: url('backface.jpg');
+            background-size: cover;
+        }
+
+        .card.flipped {
+            background-size: cover;
+            cursor: default;
+        }
+
+        #score-board {
+            margin-top: 20px;
+        }
+
+        .card.char1 {
+            background-color: #f2a4a4;
+        }
+
+        .card.char2 {
+            background-color: #a4c6f2;
+        }
+
+        .card.char3 {
+            background-color: #a4f2b8;
+        }
+
+        .card.char4 {
+            background-color: #f2efa4;
+        }
+
+        .card.char5 {
+            background-color: #f2a4df;
+        }
+
+        .card.char6 {
+            background-color: #f2d4a4;
+        }
+
+        .card.match {
+            animation: pulse 1s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #success-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 255, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 50px;
+            font-size: 70px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav-wrapper">
+            <div class="brand-name">Cores Iguais</div>
+            <!-- Se houver necessidade de adicionar itens de navegação no futuro -->
+        </div>
+    </header>
+
+    <div class="sidebar">
+        <a href="#" onclick="showMessage('Desempenho')">Desempenho</a>
+        <a href="#" onclick="showMessage('Níveis')">Níveis</a>
+        <a href="#" onclick="showMessage('Resultados')">Resultados</a>
+        <a href="index.html">Voltar para Loja</a>
+    </div>
+
+    <div class="main-content">
+        <!-- Conteúdo do jogo vai aqui -->
+        <h1>Bem-vindo ao Jogo das Cores Iguais</h1>
+        <p>Encontre as cores pares</p>
+
+        <!-- Jogo das Cores -->
+        <div id="game-board"></div>
+        <div id="score-board">
+            <p>Tentativas: <span id="attempts">0</span></p>
+            <p>Pares Encontrados: <span id="pairs">0</span></p>
+        </div>
+        <div id="success-message">Par Encontrado!</div>
+    </div>
+
+    <!-- Elemento para exibir a mensagem temporária -->
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+    </div>
+
+    <script>
+        // Função para exibir a mensagem temporária
+        function showMessage(section) {
+            var messageBox = document.getElementById('messageBox');
+            var messageText = document.getElementById('messageText');
+
+            // Define o texto da mensagem de acordo com a seção clicada
+            messageText.textContent = `Error500: Usuario teste `;
+
+            // Exibe a mensagem
+            messageBox.style.display = 'block';
+
+            // Oculta a mensagem após 3 segundos (3000 milissegundos)
+            setTimeout(function() {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardsArray = [
+                { name: 'char1', img: 'char1.jpg', colorClass: 'char1' },
+                { name: 'char2', img: 'char2.jpg', colorClass: 'char2' },
+                { name: 'char3', img: 'char3.jpg', colorClass: 'char3' },
+                { name: 'char4', img: 'char4.jpg', colorClass: 'char4' },
+                { name: 'char5', img: 'char5.jpg', colorClass: 'char5' },
+                { name: 'char6', img: 'char6.jpg', colorClass: 'char6' },
+            ];
+            let attempts = 0;
+            let pairs = 0;
+            let firstCard = null;
+            let secondCard = null;
+
+            const gameBoard = document.getElementById('game-board');
+            const attemptsDisplay = document.getElementById('attempts');
+            const pairsDisplay = document.getElementById('pairs');
+            const successMessage = document.getElementById('success-message');
+
+            const doubledCardsArray = [...cardsArray, ...cardsArray];
+            const shuffledCardsArray = doubledCardsArray.sort(() => 0.5 - Math.random());
+
+            shuffledCardsArray.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card', card.colorClass);
+                cardElement.dataset.name = card.name;
+                cardElement.dataset.img = card.img;
+                cardElement.addEventListener('click', flipCard);
+                gameBoard.appendChild(cardElement);
+            });
+
+            function flipCard(event) {
+                const clickedCard = event.target;
+                if (firstCard && secondCard) return;
+                if (clickedCard === firstCard) return;
+
+                clickedCard.classList.add('flipped');
+                clickedCard.style.backgroundImage = `url(${clickedCard.dataset.img})`;
+
+                if (!firstCard) {
+                    firstCard = clickedCard;
+                } else {
+                    secondCard = clickedCard;
+                    checkMatch();
+                }
+            }
+
+            function checkMatch() {
+                attempts++;
+                attemptsDisplay.textContent = attempts;
+
+                if (firstCard.dataset.name === secondCard.dataset.name) {
+                    pairs++;
+                    pairsDisplay.textContent = pairs;
+
+                    firstCard.classList.add('match');
+                    secondCard.classList.add('match');
+
+                    showSuccessMessage();
+
+                    firstCard.removeEventListener('click', flipCard);
+                    secondCard.removeEventListener('click', flipCard);
+                    resetCards();
+                } else {
+                    setTimeout(() => {
+                        firstCard.classList.remove('flipped');
+                        secondCard.classList.remove('flipped');
+                        firstCard.style.backgroundImage = `url('backface.jpg')`;
+                        secondCard.style.backgroundImage = `url('backface.jpg')`;
+                        resetCards();
+                    }, 1000);
+                }
+            }
+
+            function showSuccessMessage() {
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 1000);
+            }
+
+            function resetCards() {
+                firstCard = null;
+                secondCard = null;
+            }
+        });
+    </script>
+</body>
+
+</html>

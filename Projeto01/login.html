@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            background-color: #7749F8;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 300px;
+        }
+
+      
+        .login-container input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            text-align: center;
+        }
+
+        .login-container button {
+            width: 90%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            color: blueviolet;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-container button:hover {
+            background-color: lightgray;
+        }
+
+        .login {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 10px 0 7px;
+        }
+
+        .login_imagem {
+            width: 280px; /* Ajuste o tamanho da imagem aqui */
+            height: 260px; /* Ajuste o tamanho da imagem aqui */
+            border-radius: 50%;
+            margin: 0 10px 0 7px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('login-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const response = await fetch('http://localhost:3002/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nome: username, senha: password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.cookie = `token=${data.token}; path=/`;
+                    document.cookie = `empresa_codigo=${data.empresa_codigo}; path=/`;
+                    document.cookie = `nome_usuario=${data.nome}; path=/`;
+                    window.location.href = 'index.html'; // Redireciona para a página principal
+                } else {
+                    alert('Nome de usuário ou senha inválidos!');
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>
+            <img src="imagens/login.PNG" alt="Usuário" class="login_imagem">
+        </h1>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Usuário" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+
+</html>

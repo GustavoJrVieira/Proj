@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Jogo de Memória - Letras</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden; /* Evita o scroll horizontal */
+            display: flex; /* Para utilizar flexbox */
+            flex-direction: column; /* Empilhar header, sidebar e main-content verticalmente */
+        }
+
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 20px 40px; /* Aumenta o padding para aumentar a altura verticalmente */
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 23px;
+        }
+/* Sidebar Styles */
+.sidebar {
+            width: 250px;
+            background-color: #7749F8;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Fixa a barra lateral */
+            height: 100%; /* Ocupa toda a altura da tela */
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #8c68f1;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background-color: #5a37c4;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 270px; /* Espaço para a barra lateral fixa */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            border-radius: 4px;
+            padding: 20px;
+            z-index: 1000; /* Garante que a mensagem seja exibida acima de outros elementos */
+            display: none; /* Começa escondido */
+        }
+
+        /* Game Styles */
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #9046c2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 2em;
+            color: white;
+            border: 2px solid #000;
+            background-image: url('backface.jpg');
+            background-size: cover;
+        }
+
+        .card.flipped {
+            background-color: #1e90ff;
+            background-image: none;
+            cursor: default;
+            font-size: 3em;
+            color: #fff;
+        }
+
+        .card.match {
+            animation: pulse 1s;
+            background-color: #28a745 !important;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #score-board {
+            margin-top: 20px;
+        }
+
+        #success-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 255, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 50px;
+            font-size: 2em;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <a href="#" onclick="showMessage('Desempenho')">Desempenho</a>
+        <a href="#" onclick="showMessage('Níveis')">Níveis</a>
+        <a href="#" onclick="showMessage('Resultados')">Resultados</a>
+        <a href="index.html">Voltar para Loja</a>
+    </div>
+
+    <div class="main-content">
+        <!-- Conteúdo do jogo vai aqui -->
+        <h1>Bem-vindo ao Jogo de Memória com Letras</h1>
+        <p>Encontre os pares de Letras</p>
+        <div id="game-board"></div>
+        <div id="score-board">
+            <p>Tentativas: <span id="attempts">0</span></p>
+            <p>Pares Encontrados: <span id="pairs">0</span></p>
+        </div>
+        <div id="success-message">Par Encontrado!</div>
+    </div>
+
+    <!-- Elemento para exibir a mensagem temporária -->
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+    </div>
+
+    <script>
+        // Função para exibir a mensagem temporária
+        function showMessage(section) {
+            var messageBox = document.getElementById('messageBox');
+            var messageText = document.getElementById('messageText');
+
+            // Define o texto da mensagem de acordo com a seção clicada
+            messageText.textContent = `Error500: Usuario teste `;
+
+            // Exibe a mensagem
+            messageBox.style.display = 'block';
+
+            // Oculta a mensagem após 3 segundos (3000 milissegundos)
+            setTimeout(function() {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const lettersArray = ['A', 'B', 'C', 'D', 'E', 'F'];
+            let attempts = 0;
+            let pairs = 0;
+            let firstCard = null;
+            let secondCard = null;
+
+            const gameBoard = document.getElementById('game-board');
+            const attemptsDisplay = document.getElementById('attempts');
+            const pairsDisplay = document.getElementById('pairs');
+            const successMessage = document.getElementById('success-message');
+
+            const doubledLettersArray = [...lettersArray, ...lettersArray];
+            const shuffledLettersArray = doubledLettersArray.sort(() => 0.5 - Math.random());
+
+            shuffledLettersArray.forEach((letter, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.dataset.letter = letter;
+                cardElement.addEventListener('click', flipCard);
+                gameBoard.appendChild(cardElement);
+            });
+
+            function flipCard(event) {
+                const clickedCard = event.target;
+                if (firstCard && secondCard) return;
+                if (clickedCard === firstCard) return;
+
+                clickedCard.classList.add('flipped');
+                clickedCard.textContent = clickedCard.dataset.letter;
+
+                if (!firstCard) {
+                    firstCard = clickedCard;
+                } else {
+                    secondCard = clickedCard;
+                    checkMatch();
+                }
+            }
+
+            function checkMatch() {
+                attempts++;
+                attemptsDisplay.textContent = attempts;
+
+                if (firstCard.dataset.letter === secondCard.dataset.letter) {
+                    pairs++;
+                    pairsDisplay.textContent = pairs;
+
+                    firstCard.classList.add('match');
+                    secondCard.classList.add('match');
+
+                    showSuccessMessage();
+
+                    firstCard.removeEventListener('click', flipCard);
+                    secondCard.removeEventListener('click', flipCard);
+                    resetCards();
+                } else {
+                    setTimeout(() => {
+                        firstCard.classList.remove('flipped');
+                        secondCard.classList.remove('flipped');
+                        firstCard.textContent = '';
+                        secondCard.textContent = '';
+                        resetCards();
+                    }, 1000);
+                }
+            }
+
+            function showSuccessMessage() {
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 1000);
+            }
+
+            function resetCards() {
+                firstCard = null;
+                secondCard = null;
+            }
+        });
+    </script>
+</body>
+
+</html>

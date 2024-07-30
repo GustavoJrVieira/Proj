@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>GJ-Store</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            /* Evita o scroll horizontal */
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #7749F8;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #8c68f1;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background-color: #5a37c4;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #7446f3;
+            color: white;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            position: fixed;
+            z-index: 1001;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 15px;
+            /* Added padding for better alignment */
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 23px;
+        }
+
+        /* User Info Styles */
+        .user-details {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .oculto {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 10px 0 7px;
+        }
+
+        /* Container Styles */
+        .container-fluid {
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            margin-left: 250px;
+            margin-top: 50px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            width: 100%;
+        }
+
+        /* Add Section Styles */
+        .add-section {
+            width: 100%;
+            padding: 30px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #CED4DA;
+        }
+
+        .product-title {
+            font-weight: 900;
+            font-style: italic;
+            font-size: 36px;
+        }
+
+        /* Product List Styles */
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px 0;
+            width: 100%;
+        }
+
+        .product-card {
+            width: 300px;
+            border: 1px solid #CED4DA;
+            border-radius: 4px;
+            margin: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-image-container {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-details p {
+            margin: 10px 0;
+        }
+
+        .product-buttons button {
+            margin: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .product-buttons button:first-of-type {
+            background-color: #7749F8;
+            color: #FFF;
+        }
+
+        .product-buttons button:last-of-type {
+            background-color: #FFF;
+            color: #7749F8;
+            border: 1px solid #7749F8;
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid #FFF;
+            border-radius: 4px;
+            padding: 8px 16px;
+            color: #FFF;
+            cursor: pointer;
+            margin-left: 10px;
+            height: 39px;
+            width: 63px;
+            font-weight: 700;
+        }
+
+        .logout-btn:hover {
+            opacity: 80%;
+        }
+
+        .logout-btn:active {
+            opacity: 50%;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 665px) {
+            .product-image {
+                height: 102px;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            header {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .container-fluid {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav-wrapper">
+            <div class="brand-name">
+                GJ-Clinic
+            </div>
+            <div class="user-details">
+                Olá, <span id="nome-usuario"></span>
+                <img src="imagens/oculto.png" alt="Usuário" class="oculto">
+                <a href="login.html" class="logout-btn" onclick="logout()">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="sidebar">
+        <a href="#">Registro de Gestão</a>
+        <a href="#">Desempenho</a>
+        <a href="#">Relatórios</a>
+        <a href="#">Notificações</a>
+        <a href="#">Segurança</a>
+        <a href="#">Suporte</a>
+    </div>
+
+    <div class="container-fluid">
+        <div class="main-content">
+            <div class="add-section">
+                <div class="product-title">
+                    Jogos
+                </div>
+            </div>
+
+            <div class="product-list">
+                <!-- Exemplo de produto -->
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="imagens/cores.PNG" alt="Jogo 1" class="product-image">
+                    </div>
+                    <div class="product-details">
+                        <p>Cores Iguais</p>
+                    </div>
+                    <div class="product-buttons">
+                        <button onclick="detalhesJogo1()">Detalhes</button>
+                        <button onclick="jogarJogo('jogoCores.html')">Jogar</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="imagens/emojis.PNG" alt="Jogo 2" class="product-image">
+                    </div>
+                    <div class="product-details">
+                        <p>Emojis Iguais</p>
+                    </div>
+                    <div class="product-buttons">
+                        <button onclick="detalhesJogo2()">Detalhes</button>
+                        <button onclick="jogarJogo('emojis.html')">Jogar</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="imagens/letras.PNG" alt="Jogo 3" class="product-image">
+                    </div>
+                    <div class="product-details">
+                        <p>Letras Iguais</p>
+                    </div>
+                    <div class="product-buttons">
+                        <button onclick="detalhesJogo1()">Detalhes</button>
+                        <button onclick="jogarJogo('letrasmemoria.html')">Jogar</button>
+                    </div>
+                </div>
+                <!-- Adicione mais produtos conforme necessário -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let produtos = [];
+
+        // Obtém o token do cookie
+        const token = getCookie('token');
+        // Se o token não existir ou for expirado, realiza logout
+        if (!token || token == "expirado") {
+            logout();
+        }
+
+        // Exibe o nome do usuário no span
+        var span = document.getElementById('nome-usuario'),
+            text = document.createTextNode(getCookie('nome_usuario'));
+        span.innerHTML = '';
+        span.appendChild(text);
+
+        // Função para mostrar detalhes do jogo
+        function detalhesJogo(codigoProduto) {
+            alert(`Detalhes do Jogo ${codigoProduto}`);
+        }
+
+        // Função para iniciar o jogo
+        function jogarJogo(jogoUrl) {
+            window.location.href = jogoUrl;
+        }
+
+        // Função para obter um cookie pelo nome
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Função para realizar logout
+        function logout() {
+            document.cookie = 'token=expirado; path=/'; // Define o token como expirado
+            document.cookie = 'nome_usuario=; path=/'; // Limpa o nome do usuário
+            window.location.href = 'login.html'; // Redireciona para a página de login
+        }
+    </script>
+</body>
+
+</html>
