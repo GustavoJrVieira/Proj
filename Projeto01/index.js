@@ -206,6 +206,68 @@ app.put('/usuario/:codigoUsuario', validarToken, async (requisicao, resposta) =>
 })
 // FIM END POINT USUARIO
 
+// INICIO PACIENTE
+app.get('/paciente', validarToken, async (requisicao, resposta) => {
+    try {
+        const { nomePaciente, cpfPaciente } = requisicao.params;
+        resposta.status(200).json(await findpaciente(nomePaciente, cpfPaciente, null));
+    } catch (err) {
+        console.log("Erro end point get/paciente", err);
+        resposta.status(500).json({ mensagem: err.message });
+    }
+});
+
+app.post('/paciente', validarToken, async (requisicao, resposta) => {
+    try {
+        const paciente = requisicao.body;
+        await insertpaciente(paciente);
+        resposta.status(200).json(`Paciente criado!`);
+    } catch (err) {
+        console.log("Erro end point post/paciente", err);
+        resposta.status(500).json({ mensagem: err.message });
+    }
+})
+
+app.delete('/paciente/:id', validarToken, async (requisicao, resposta) => {
+    try {
+        const { id } = requisicao.params;
+        const retorno = await deletePaciente(id);
+        if (retorno.rowCount > 0) {
+            resposta.status(200).json(`Paciente ${id} excluído!`);
+        } else {
+            resposta.status(200).json(`Paciente ${id} já foi excluido, ou não existe!`);
+        }
+    } catch (err) {
+        console.log("Erro end point delete/paciente", err);
+        resposta.status(500).json({ mensagem: err.message });
+    }
+})
+
+app.put('/paciente/:id', validarToken, async (requisicao, resposta) => {
+    try {
+        const { id } = requisicao.params;
+        const pacienteAtualizar = requisicao.body;
+        const pacienteAtual = (await findpaciente(null, null, id)).rows;
+
+        // VERIFICA E ALTERA APENAS OS CAMPOS ENVIADOS PARA O BACKEND QUE FORAM ALTERADOS
+        Object.keys(pacienteAtualizar).forEach(key => {
+            if (pacienteAtual[key] !== pacienteAtualizar[key]) {
+                pacienteAtual[key] = pacienteAtualizar[key];
+            }
+        });
+        const retorno = await updatepaciente(pacienteAtualizar, id);
+        if (retorno.rowCount > 0) {
+            resposta.status(200).json(`Paciente ${id} alterado!`);
+        } else {
+            resposta.status(200).json(`Paciente ${id} não encontrado/aterado!`);
+        }
+    } catch (err) {
+        console.log("Erro end point put/usuario", err);
+        resposta.status(500).json({ mensagem: err.message });
+    }
+})
+
+
 // INICIO END POINT PRODUTO
 app.get('/produto/:codigoProduto', validarToken, async (requisicao, resposta) => {
     try {
@@ -306,20 +368,20 @@ async function findLastUsuarioCodigo() {
     return db.query(sql);
 }
 
-async function findUsuario(codigoUsuario, nomeUsuario, codigoEmpresa) {
+async function findUsuario(codigoUsuario, nomePaciente, codigoEmpresa) {
     var sql = `SELECT *
                  FROM usuario u
                 WHERE 1=1 
                 ${codigoUsuario ? ` AND u.codigo = ${codigoUsuario}` : ''}
-                ${nomeUsuario ? ` AND u.nome ILIKE '${nomeUsuario}'` : ''}
+                ${nomePaciente ? ` AND u.nome ILIKE '${nomePaciente}'` : ''}
                 ${codigoEmpresa ? ` AND u.empresa_codigo = '${codigoEmpresa}';` : ''}`;
     console.log('sql: ', sql);
     return db.query(sql);
 };
 
 async function insertUsuario(usuario) {
-    var sql = `INSERT INTO usuario (empresa_codigo, nome, senha) 
-                    VALUES (${usuario.empresaCodigo}, '${usuario.nome}', '${usuario.senha}');`;
+    var sql = `INSERT INTO usuario (empresa_codigo, nome, senha, tp_usuario, id_paciente) 
+                    VALUES (${usuario.empresaCodigo}, '${usuario.nome}', '${usuario.senha}','${usuario.tp_usuario}',${usuario.id_paciente});`;
     console.log('sql: ', sql);
     return db.query(sql);
 }
@@ -342,6 +404,85 @@ async function updateUsuario(usuarioAtualizar, codigoUsuario) {
     return db.query(sql);
 }
 // FIM DAO USUARIO
+// INICIO PACIENTE
+
+async function findpaciente(nomePaciente, cpfPaciente, id) {
+    var sql = `SELECT *
+                 FROM pacientes pc
+                WHERE 1=1 
+                ${id ? ` AND pc.id = ${id}` : ''}
+                ${nomePaciente ? ` AND pc.nm_paciente ILIKE '${nomePaciente}'` : ''}
+                ${cpfPaciente ? ` AND pc.cpf_paciente = '${cpfPaciente}';` : ''}`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+};
+
+async function insertpaciente(paciente) {
+    var sql = `INSERT INTO pacientes (id, nm_paciente, dt_nascimento, rg_paciente, cpf_paciente, ds_observacao) 
+                    VALUES (${paciente.id}, '${paciente.nomePaciente}', '${paciente.dataNascimento}', '${paciente.rg}', '${paciente.cpf}',${paciente.observacao});`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+}
+
+async function deletePaciente(id) {
+    var sql = `DELETE 
+                 FROM pacientes 
+                WHERE id = ${id};`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+}
+
+async function updatepaciente(paciente, id) {
+    var sql = `UPDATE pacientes 
+                  SET nm_paciente = '${paciente.nomePaciente}', 
+                      dt_nascimento = '${paciente.dataNascimento}',
+                      rg_paciente = '${paciente.rg}',
+                      cpf_paciente = '${paciente.cpf}',
+                      ds_observacao = '${paciente.observacao}'
+                WHERE id = ${id};`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+}
+
+// INICIO AVALIACAO
+
+async function findavaliacao(idPaciente) {
+    var sql = `SELECT *
+                 FROM avaliacao av
+                WHERE 1=1 
+                ${idPaciente ? ` AND av.id_paciente = ${idPaciente}` : ''}`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+};
+
+async function insertavaliacao(avaliacao) {
+    var sql = `INSERT INTO avaliacao (id_paciente, id_usuario, tp_jogo, nr_potuacao, qt_tempo, tp_status, ds_observacao) 
+                    VALUES ('${avaliacao.idPaciente}', '${avaliacao.idUsuario}', '${avaliacao.tpJogo}','${avaliacao.nrPontuacao}',${avaliacao.qtTempo}',${avaliacao.tpStatus},${avaliacao.dsObservacao}'');`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+}
+
+async function deleteavaliacao(id) {
+    var sql = `DELETE 
+                 FROM avaliacao 
+                WHERE id = ${id};`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+}
+
+async function updateavaliacao(avaliacao, id) {
+    var sql = `UPDATE avaliacao 
+                  SET tp_status = ${avaliacao.tpStatus}, 
+                      nr_pontuacao = '${avaliacao.nrPontuacao}',
+                      tp_jogo = '${avaliacao.tpJogo}',
+                      qt_tempo = '${avaliacao.qtTempo}',
+                      ds_observacao = '${avaliacao.dsObservacao}'
+                WHERE id = ${id};`;
+    console.log('sql: ', sql);
+    return db.query(sql);
+}
+
+
 //Este trecho de código define um conjunto de funções assíncronas para interagir com um banco de dados, realizando operações CRUD
 // INICIO DAO PRODUTO
 async function findLastProdutoCodigo() {
