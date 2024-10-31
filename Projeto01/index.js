@@ -206,7 +206,7 @@ app.put('/usuario/:codigoUsuario', validarToken, async (requisicao, resposta) =>
 })
 // FIM END POINT USUARIO
 
-// INICIO PACIENTE
+// INICIO END POINT PACIENTE
 app.get('/paciente', validarToken, async (requisicao, resposta) => {
     try {
         const { nomePaciente, cpfPaciente } = requisicao.params;
@@ -267,98 +267,71 @@ app.put('/paciente/:id', validarToken, async (requisicao, resposta) => {
     }
 })
 
-
-// INICIO END POINT PRODUTO
-app.get('/produto/:codigoProduto', validarToken, async (requisicao, resposta) => {
+// GET Avaliação
+app.get('/avaliacao', validarToken, async (requisicao, resposta) => {
     try {
-        const { rows } = await findProduto(requisicao.params.codigoProduto, null, null);
-        resposta.json(rows[0]);
+        const { idAvaliacao, idPaciente } = requisicao.params; // Supondo que você possa procurar por idAvaliacao ou idPaciente
+        resposta.status(200).json(await findAvaliacao(idAvaliacao, idPaciente, null)); // Função que busca por avaliação
     } catch (err) {
-        console.log("Erro end point get/produto", err);
+        console.log("Erro end point get/avaliacao", err);
         resposta.status(500).json({ mensagem: err.message });
     }
 });
 
-app.get('/produto/codigo-empresa/:codigoEmpresa', validarToken, async (requisicao, resposta) => {
+// POST Avaliação
+app.post('/avaliacao', validarToken, async (requisicao, resposta) => {
     try {
-        const { rows } = await findProduto(null, null, requisicao.params.codigoEmpresa);
-        resposta.json(rows);
+        const avaliacao = requisicao.body; // Dados da avaliação passados no body
+        await insertAvaliacao(avaliacao);  // Função que insere a avaliação
+        resposta.status(200).json(`Avaliação criada!`);
     } catch (err) {
-        console.log("Erro end point get/produto/codigo-empresa", err);
+        console.log("Erro end point post/avaliacao", err);
         resposta.status(500).json({ mensagem: err.message });
     }
 });
 
-app.post('/produto', validarToken, async (requisicao, resposta) => {
+// DELETE Avaliação
+app.delete('/avaliacao/:id', validarToken, async (requisicao, resposta) => {
     try {
-        const { produto } = requisicao.body;
-        console.log(produto);
-
-        if (produto.caminho_imagem && produto.caminho_imagem != '') {
-            let base64Image = produto.caminho_imagem.split(';base64,').pop();
-            fs.writeFile(DIRETORIO_ARQUIVO + produto.nomeImagem, base64Image, { encoding: 'base64' }, function (err) {
-                console.log('Arquivo Criado');
-                produto.caminho_imagem = DIRETORIO_ARQUIVO + produto.nomeImagem
-            });
+        const { id } = requisicao.params; // ID da avaliação a ser deletada
+        const retorno = await deleteAvaliacao(id); // Função que deleta a avaliação
+        if (retorno.rowCount > 0) {
+            resposta.status(200).json(`Avaliação ${id} excluída!`);
+        } else {
+            resposta.status(200).json(`Avaliação ${id} já foi excluída ou não existe!`);
         }
-
-        const teste = await insertProduto(produto);
-        console.log('Teste insertProduto: ', teste);
-        const { rows } = await findLastProdutoCodigo();
-        resposta.status(200).json({ codigoProduto: rows[0].max });
     } catch (err) {
-        console.log("Erro end point post/produto", err);
+        console.log("Erro end point delete/avaliacao", err);
         resposta.status(500).json({ mensagem: err.message });
     }
-})
+});
 
-app.delete('/produto/:codigoProduto', validarToken, async (requisicao, resposta) => {
+// PUT Avaliação (atualizar)
+app.put('/avaliacao/:id', validarToken, async (requisicao, resposta) => {
     try {
-        const { codigoProduto } = requisicao.params;
-        const teste = await deleteProduto(codigoProduto);
-        resposta.status(200).json(`Produto ${codigoProduto} excluído!`);
-    } catch (err) {
-        console.log("Erro end point delete/produto", err);
-        resposta.status(500).json({ mensagem: err.message });
-    }
-})
+        const { id } = requisicao.params; // ID da avaliação a ser atualizada
+        const avaliacaoAtualizar = requisicao.body; // Dados para atualizar
+        const avaliacaoAtual = (await findAvaliacao(null, null, id)).rows; // Buscar avaliação pelo ID
 
-app.put('/produto/:codigoProduto', validarToken, async (requisicao, resposta) => {
-    try {
-        const { codigoProduto } = requisicao.params;
-        const { produto } = requisicao.body;
-        const produtoAtual = (await findProduto(codigoProduto, null, null)).rows[0];
-
-        if (!produtoAtual) {
-            return resposta.status(500).json(`Produto ${codigoProduto} não encontrado!`);
-        }
-
-        Object.keys(produto).forEach(key => {
-            if (produtoAtual[key] !== produto[key]) {
-                console.log(key);
-                if (produto[key] == 'caminho_imagem') {
-                    let base64Image = produto.caminho_imagem.split(';base64,').pop();
-                    fs.writeFile(DIRETORIO_ARQUIVO + produto.nomeImagem, base64Image, { encoding: 'base64' }, function (err) {
-                        console.log('Arquivo Criado');
-                        produto[key] = DIRETORIO_ARQUIVO + produto.nomeImagem
-                    });
-                }
-                produtoAtual[key] = produto[key];
+        // VERIFICA E ALTERA APENAS OS CAMPOS ENVIADOS PARA O BACKEND QUE FORAM ALTERADOS
+        Object.keys(avaliacaoAtualizar).forEach(key => {
+            if (avaliacaoAtual[key] !== avaliacaoAtualizar[key]) {
+                avaliacaoAtual[key] = avaliacaoAtualizar[key];
             }
         });
 
-        const retorno = await updateProduto(produtoAtual, codigoProduto);
+        const retorno = await updateAvaliacao(avaliacaoAtualizar, id); // Função que atualiza a avaliação
         if (retorno.rowCount > 0) {
-            resposta.status(200).json(`Produto ${codigoProduto} alterado!`);
+            resposta.status(200).json(`Avaliação ${id} alterada!`);
         } else {
-            resposta.status(500).json(`Produto ${codigoProduto} não alterado!`);
+            resposta.status(200).json(`Avaliação ${id} não foi encontrada/alterada!`);
         }
     } catch (err) {
-        console.log("Erro end point put/produto", err);
+        console.log("Erro end point put/avaliacao", err);
         resposta.status(500).json({ mensagem: err.message });
     }
-})
-// FIM END POINT PRODUTO
+});
+
 
 // INICIO DAO USUARIO
 async function findLastUsuarioCodigo() {
