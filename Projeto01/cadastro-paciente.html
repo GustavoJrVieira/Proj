@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+    <title>GJ-Store</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            /* Evita o scroll horizontal */
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #7749F8;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+            justify-content: center;
+            /* Centraliza verticalmente */
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            margin: 15px 0;
+            background-color: #8c68f1;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background-color: #5a37c4;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #7446f3;
+            color: white;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            position: fixed;
+            z-index: 1001;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 15px;
+            /* Added padding for better alignment */
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 23px;
+        }
+
+        /* User Info Styles */
+        .user-details {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .oculto {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 10px 0 7px;
+        }
+
+        /* Container Styles */
+        .container-fluid {
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            margin-left: 250px;
+            margin-top: 50px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            width: 100%;
+        }
+
+        /* Add Section Styles */
+        .add-section {
+            width: 100%;
+            padding: 30px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #CED4DA;
+        }
+
+        .product-title {
+            font-weight: 900;
+            font-style: italic;
+            font-size: 36px;
+        }
+
+        /* Estilo para a lista de produtos */
+        .product-list {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-list input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Estilo para os botões */
+        .product-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 48%;
+        }
+
+        .btn-action:hover {
+            background-color: #45a049;
+        }
+
+        /* Estilo para a tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Responsividade para dispositivos móveis */
+        @media screen and (max-width: 600px) {
+            .product-buttons {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            table th,
+            table td {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid #FFF;
+            border-radius: 4px;
+            padding: 8px 16px;
+            color: #FFF;
+            cursor: pointer;
+            margin-left: 10px;
+            height: 39px;
+            width: 63px;
+            font-weight: 700;
+        }
+
+        .logout-btn:hover {
+            opacity: 80%;
+        }
+
+        .logout-btn:active {
+            opacity: 50%;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 665px) {
+            .product-image {
+                height: 102px;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            header {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .container-fluid {
+                margin-left: 0;
+            }
+        }
+
+        /* Estilo para o botão */
+        #openModalBtn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #openModalBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilização geral para modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Estilização para os inputs e textarea */
+        .modal-content input[type="text"],
+        .modal-content input[type="date"],
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Botão de salvar estilizado */
+        .btn-save {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .btn-save:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsividade para telas menores */
+        @media screen and (max-width: 600px) {
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .modal-content h2 {
+                font-size: 1.5em;
+            }
+
+            .btn-save {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav-wrapper">
+            <div class="brand-name">
+                GJ-Clinic
+            </div>
+            <div class="user-details">
+                Olá, <span id="nome-usuario"></span>
+                <img src="imagens/oculto.png" alt="Usuário" class="oculto">
+                <a href="login.html" class="logout-btn" onclick="logout()">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="sidebar">
+        <a href="#">Cadastro Paciente</a>
+        <a href="#">Cadastro Avaliação</a>
+        <a href="#">Desempenho</a>
+    </div>
+
+    <div class="container-fluid">
+        <div class="main-content">
+            <div class="add-section">
+                <div class="product-title">
+                    Paciente(s)
+                </div>
+            </div>
+
+            <div class="product-list">
+                <input type="text" name="nome-paciente-filtro" id="nome-paciente-filtro" placeholder="Nome Paciente">
+                <input type="text" name="cpf-paciente-filtro" id="cpf-paciente-filtro" placeholder="CPF Paciente">
+
+                <div class="product-buttons">
+                    <button class="btn-action" onclick="buscarPacientes()">Buscar</button>
+                    <button class="btn-action" onclick="abrirModal()">Cadastrar</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Data Nascimento</th>
+                            <th>CPF</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-pacientes">
+                        <!-- Os pacientes cadastrados serão adicionados aqui -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Cadastro Paciente</h2>
+                    <input type="text" name="nome-paciente" id="nome-paciente" placeholder="Nome Paciente">
+                    <input type="text" name="rg-paciente" id="rg-paciente" placeholder="RG Paciente">
+                    <input type="text" name="cpf-paciente" id="cpf-paciente" placeholder="CPF Paciente">
+                    <input type="date" name="data-nascimento" id="data-nascimento">
+                    <textarea name="observacao" id="observacao" placeholder="Observação"></textarea>
+                    <button class="btn-save" id="btn-save" onclick="cadastrarPaciente()">Salvar</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const URL_API = "http://localhost:3002/paciente"
+            let pacientes = [];
+
+            const modal = document.getElementById("myModal");
+            const spanModal = document.getElementsByClassName("close")[0];
+            spanModal.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            // Obtém o token do cookie
+            const token = getCookie('token');
+            // Se o token não existir ou for expirado, realiza logout
+            if (!token || token == "expirado") {
+                logout();
+            }
+
+            function buscarPacientes() {
+                const nomePaciente = document.getElementById("nome-paciente-filtro");
+                const cpfPaciente = document.getElementById("cpf-paciente-filtro");
+
+                const myHeaders = new Headers();
+                myHeaders.append("access-token", token);
+                myHeaders.append("Content-Type", "application/json");
+
+                const requestOptions = {
+                    method: "GET",
+                    headers: myHeaders
+                };
+
+                fetch(URL_API, requestOptions)
+                    .then(async (response) => {
+                        const pacientes = await response.json()
+                        var temp = "";
+                        pacientes.forEach((paciente => {
+                            temp += "<tr>";
+                            temp += "<td>" + paciente.nm_paciente + "</td>";
+                            temp += "<td>" + paciente.dt_nascimento + "</td>";
+                            temp += "<td>" + paciente.cpf_paciente + "</td></tr>";
+                        }));
+                        document.getElementById('lista-pacientes').innerHTML = temp;
+                    })
+                    .then((result) => console.log(result))
+                    .catch((error) => console.error(error));
+            }
+
+            buscarPacientes();
+
+            function abrirModal() {
+                modal.style.display = "block";
+            }           
+
+            function cadastrarPaciente() {
+                const myHeaders = new Headers();
+                myHeaders.append("access-token", token);
+                myHeaders.append("Content-Type", "application/json");
+                const paciente = {};
+                paciente.id = 3;
+                paciente.nomePaciente = document.getElementById("nome-paciente").value;
+                paciente.dataNascimento = document.getElementById("data-nascimento").value;
+                paciente.rg = document.getElementById("rg-paciente").value;
+                paciente.cpf = document.getElementById("cpf-paciente").value;
+                paciente.observacao = document.getElementById("observacao").value;
+
+                const requestOptions = {
+                    method: "POST",
+                    body: JSON.stringify(paciente),
+                    headers: myHeaders
+                };
+
+                fetch(URL_API, requestOptions)
+                    .then((response) => {
+                        modal.style.display = "none";
+                        buscarPacientes();
+                    })
+                    .then((result) => console.log(result))
+                    .catch((error) => console.error(error));
+            }
+
+            // Exibe o nome do usuário no span
+            var span = document.getElementById('nome-usuario'),
+                text = document.createTextNode(getCookie('nome_usuario'));
+            span.innerHTML = '';
+            span.appendChild(text);
+
+            // Função para obter um cookie pelo nome
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            }
+
+            // Função para realizar logout
+            function logout() {
+                document.cookie = 'token=expirado; path=/'; // Define o token como expirado
+                document.cookie = 'nome_usuario=; path=/'; // Limpa o nome do usuário
+                window.location.href = 'login.html'; // Redireciona para a página de login
+            }
+        </script>
+</body>
+
+</html>

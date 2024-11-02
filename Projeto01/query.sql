@@ -26,3 +26,4 @@ CREATE TABLE public.avaliacao (
 ALTER TABLE public.usuario ADD tp_usuario varchar DEFAULT ADMIN NOT NULL;
 ALTER TABLE public.usuario ADD id_paciente integer NULL;
 ALTER TABLE public.usuario ADD CONSTRAINT usuario_pacientes_fk FOREIGN KEY (id_paciente) REFERENCES public.pacientes(id);
+ALTER TABLE public.avaliacao ADD nm_avaliacao varchar NOT NULL;

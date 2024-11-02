@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Cores Iguais - Jogo de Memória com Emojis</title>
-    <link rel="stylesheet" href="">
+    <title>Jogo de Memória - Números</title>
     <style>
         /* Reset CSS */
         * {
@@ -25,13 +24,12 @@
             flex-direction: column; /* Empilhar header, sidebar e main-content verticalmente */
         }
 
- 
         .nav-wrapper {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 0 15px; /* Ajuste de padding para melhor alinhamento */
+            padding: 20px 40px; /* Aumenta o padding para aumentar a altura verticalmente */
         }
 
         .brand-name {
@@ -76,6 +74,20 @@
             align-items: center;
         }
 
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            border-radius: 4px;
+            padding: 20px;
+            z-index: 1000; /* Garante que a mensagem seja exibida acima de outros elementos */
+            display: none; /* Começa escondido */
+        }
+
         /* Game Styles */
         #game-board {
             display: grid;
@@ -86,7 +98,7 @@
         .card {
             width: 100px;
             height: 100px;
-            background-color: #8a36da;
+            background-color: #9046c2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -99,11 +111,11 @@
         }
 
         .card.flipped {
-            background-color: #8a36da;
+            background-color: #1e90ff;
             background-image: none;
             cursor: default;
             font-size: 3em;
-            color: #000;
+            color: #fff;
         }
 
         .card.match {
@@ -144,23 +156,15 @@
 </head>
 
 <body>
-    <header>
-        <div class="nav-wrapper">
-            <div class="brand-name">Cores Iguais</div>
-        </div>
-    </header>
-
     <div class="sidebar">
-        <a href="#" onclick="showMessage('Resultados')">Encerrar Jogo</a>
+        <a href="#" onclick="showMessage('Resultados')">Encerrar Prova</a>
         <a href="index.html">Voltar para Loja</a>
     </div>
 
     <div class="main-content">
         <!-- Conteúdo do jogo vai aqui -->
-        <h1>Bem-vindo ao Jogo de Memória com Emojis</h1>
-        <p>Encontre os pares de emojis</p>
-
-        <!-- Jogo de Memória com Emojis -->
+        <h1>Bem-vindo ao Jogo de Memória com Números</h1>
+        <p>Encontre os pares de Números</p>
         <div id="game-board"></div>
         <div id="score-board">
             <p>Tentativas: <span id="attempts">0</span></p>
@@ -193,7 +197,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const emojisArray = ['😀', '😂', '😅', '😍', '😎', '😭', '😡', '😱'];
+            const numbersArray = ['1', '2', '3', '4', '5', '6'];
             let attempts = 0;
             let pairs = 0;
             let firstCard = null;
@@ -204,31 +208,24 @@
             const pairsDisplay = document.getElementById('pairs');
             const successMessage = document.getElementById('success-message');
 
-            const doubledEmojisArray = [...emojisArray, ...emojisArray];
-            const shuffledEmojisArray = doubledEmojisArray.sort(() => 0.5 - Math.random());
+            const doubledNumbersArray = [...numbersArray, ...numbersArray];
+            const shuffledNumbersArray = doubledNumbersArray.sort(() => 0.5 - Math.random());
 
-            shuffledEmojisArray.forEach((emoji, index) => {
+            shuffledNumbersArray.forEach((number, index) => {
                 const cardElement = document.createElement('div');
                 cardElement.classList.add('card');
-                cardElement.dataset.emoji = emoji;
+                cardElement.dataset.number = number;
                 cardElement.addEventListener('click', flipCard);
-
-                const emojiElement = document.createElement('div');
-                emojiElement.classList.add('emoji');
-                emojiElement.textContent = emoji;
-                emojiElement.style.display = 'none'; // Hide the emoji initially
-                cardElement.appendChild(emojiElement);
-
                 gameBoard.appendChild(cardElement);
             });
 
             function flipCard(event) {
-                const clickedCard = event.target.closest('.card');
+                const clickedCard = event.target;
                 if (firstCard && secondCard) return;
                 if (clickedCard === firstCard) return;
 
                 clickedCard.classList.add('flipped');
-                clickedCard.querySelector('.emoji').style.display = 'block';
+                clickedCard.textContent = clickedCard.dataset.number;
 
                 if (!firstCard) {
                     firstCard = clickedCard;
@@ -242,7 +239,7 @@
                 attempts++;
                 attemptsDisplay.textContent = attempts;
 
-                if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+                if (firstCard.dataset.number === secondCard.dataset.number) {
                     pairs++;
                     pairsDisplay.textContent = pairs;
 
@@ -258,8 +255,8 @@
                     setTimeout(() => {
                         firstCard.classList.remove('flipped');
                         secondCard.classList.remove('flipped');
-                        firstCard.querySelector('.emoji').style.display = 'none';
-                        secondCard.querySelector('.emoji').style.display = 'none';
+                        firstCard.textContent = '';
+                        secondCard.textContent = '';
                         resetCards();
                     }, 1000);
                 }

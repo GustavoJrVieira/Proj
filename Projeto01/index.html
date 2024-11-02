@@ -38,13 +38,15 @@
             position: fixed;
             height: 100%;
             z-index: 1000;
+            justify-content: center;
+            /* Centraliza verticalmente */
         }
 
         .sidebar a {
             text-decoration: none;
             color: white;
             padding: 10px;
-            margin: 5px 0;
+            margin: 15px 0;
             background-color: #8c68f1;
             border-radius: 4px;
             text-align: center;
@@ -239,25 +241,25 @@
     </header>
 
     <div class="sidebar">
-        <a href="#">Registro de Gestão</a>
+        <a onclick="cadastroPaciente()">Cadastro Paciente</a>
+        <a href="#">Cadastro Avaliação</a>
         <a href="#">Desempenho</a>
-        <a href="#">Relatórios</a>
-        <a href="#">Notificações</a>
-        <a href="#">Segurança</a>
-        <a href="#">Suporte</a>
     </div>
 
     <div class="container-fluid">
         <div class="main-content">
             <div class="add-section">
                 <div class="product-title">
-                    Jogos
+                    Dashboard
                 </div>
             </div>
 
             <div class="product-list">
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
                 <!-- Exemplo de produto -->
-                <div class="product-card">
+                <!-- <div class="product-card">
                     <div class="product-image-container">
                         <img src="imagens/cores.PNG" alt="Jogo 1" class="product-image">
                     </div>
@@ -293,12 +295,50 @@
                         <button onclick="jogarJogo('letrasmemoria.html')">Jogar</button>
                     </div>
                 </div>
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="imagens/numerosIguais.PNG" alt="Jogo 4" class="product-image">
+                    </div>
+                    <div class="product-details">
+                        <p>Numeros Iguais</p>
+                    </div>
+                    <div class="product-buttons">
+                        <button onclick="detalhesJogo2()">Detalhes</button>
+                        <button onclick="jogarJogo('numeroIguais.html')">Jogar</button>
+                    </div>
+                </div> -->
                 <!-- Adicione mais produtos conforme necessário -->
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jogo X', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: 'Evolução',
+                    data: [500, 319, 223, 335, 42,533],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function cadastroPaciente() {
+            window.location.href = "cadastro-paciente.html";
+        }
+
         let produtos = [];
 
         // Obtém o token do cookie

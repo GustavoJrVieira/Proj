@@ -210,7 +210,8 @@ app.put('/usuario/:codigoUsuario', validarToken, async (requisicao, resposta) =>
 app.get('/paciente', validarToken, async (requisicao, resposta) => {
     try {
         const { nomePaciente, cpfPaciente } = requisicao.params;
-        resposta.status(200).json(await findpaciente(nomePaciente, cpfPaciente, null));
+        const pacientes = await findpaciente(nomePaciente, cpfPaciente, null)
+        resposta.status(200).json(pacientes.rows);
     } catch (err) {
         console.log("Erro end point get/paciente", err);
         resposta.status(500).json({ mensagem: err.message });
@@ -282,7 +283,7 @@ app.get('/avaliacao', validarToken, async (requisicao, resposta) => {
 app.post('/avaliacao', validarToken, async (requisicao, resposta) => {
     try {
         const avaliacao = requisicao.body; // Dados da avaliação passados no body
-        await insertAvaliacao(avaliacao);  // Função que insere a avaliação
+        await insertavaliacao(avaliacao);  // Função que insere a avaliação
         resposta.status(200).json(`Avaliação criada!`);
     } catch (err) {
         console.log("Erro end point post/avaliacao", err);
@@ -392,7 +393,7 @@ async function findpaciente(nomePaciente, cpfPaciente, id) {
 
 async function insertpaciente(paciente) {
     var sql = `INSERT INTO pacientes (id, nm_paciente, dt_nascimento, rg_paciente, cpf_paciente, ds_observacao) 
-                    VALUES (${paciente.id}, '${paciente.nomePaciente}', '${paciente.dataNascimento}', '${paciente.rg}', '${paciente.cpf}',${paciente.observacao});`;
+                    VALUES (${paciente.id}, '${paciente.nomePaciente}', '${paciente.dataNascimento}', '${paciente.rg}', '${paciente.cpf}', '${paciente.observacao}');`;
     console.log('sql: ', sql);
     return db.query(sql);
 }
@@ -429,8 +430,8 @@ async function findavaliacao(idPaciente) {
 };
 
 async function insertavaliacao(avaliacao) {
-    var sql = `INSERT INTO avaliacao (id_paciente, id_usuario, tp_jogo, nr_potuacao, qt_tempo, tp_status, ds_observacao) 
-                    VALUES ('${avaliacao.idPaciente}', '${avaliacao.idUsuario}', '${avaliacao.tpJogo}','${avaliacao.nrPontuacao}',${avaliacao.qtTempo}',${avaliacao.tpStatus},${avaliacao.dsObservacao}'');`;
+    var sql = `INSERT INTO avaliacao (id, id_paciente, id_usuario, tp_jogo, nr_potuacao, qt_tempo, tp_status, ds_observacao, nm_avaliacao) 
+                    VALUES (${avaliacao.id}, ${avaliacao.idPaciente}, 2, '${avaliacao.tpJogo}', 0, 0,'${avaliacao.tpStatus}','${avaliacao.dsObservacao}', '${avaliacao.nomeAvaliacao}');`;
     console.log('sql: ', sql);
     return db.query(sql);
 }
