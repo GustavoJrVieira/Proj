@@ -271,8 +271,9 @@ app.put('/paciente/:id', validarToken, async (requisicao, resposta) => {
 // GET Avaliação
 app.get('/avaliacao', validarToken, async (requisicao, resposta) => {
     try {
-        const { idAvaliacao, idPaciente } = requisicao.params; // Supondo que você possa procurar por idAvaliacao ou idPaciente
-        resposta.status(200).json(await findAvaliacao(idAvaliacao, idPaciente, null)); // Função que busca por avaliação
+        const { idAvaliacao, idPaciente } = requisicao.query; // Supondo que você possa procurar por idAvaliacao ou idPaciente
+        const avaliacoes = await findavaliacao(idAvaliacao, idPaciente)
+        resposta.status(200).json(avaliacoes.rows); // Função que busca por avaliação
     } catch (err) {
         console.log("Erro end point get/avaliacao", err);
         resposta.status(500).json({ mensagem: err.message });
@@ -312,7 +313,7 @@ app.put('/avaliacao/:id', validarToken, async (requisicao, resposta) => {
     try {
         const { id } = requisicao.params; // ID da avaliação a ser atualizada
         const avaliacaoAtualizar = requisicao.body; // Dados para atualizar
-        const avaliacaoAtual = (await findAvaliacao(null, null, id)).rows; // Buscar avaliação pelo ID
+        const avaliacaoAtual = (await findavaliacao(id, null)).rows; // Buscar avaliação pelo ID
 
         // VERIFICA E ALTERA APENAS OS CAMPOS ENVIADOS PARA O BACKEND QUE FORAM ALTERADOS
         Object.keys(avaliacaoAtualizar).forEach(key => {
@@ -420,10 +421,11 @@ async function updatepaciente(paciente, id) {
 
 // INICIO AVALIACAO
 
-async function findavaliacao(idPaciente) {
+async function findavaliacao(id, idPaciente) {
     var sql = `SELECT *
-                 FROM avaliacao av
+                 FROM avaliacao av INNER JOIN pacientes p ON av.id_paciente = p.id
                 WHERE 1=1 
+                ${id ? ` AND av.id = ${id}` : ''}
                 ${idPaciente ? ` AND av.id_paciente = ${idPaciente}` : ''}`;
     console.log('sql: ', sql);
     return db.query(sql);

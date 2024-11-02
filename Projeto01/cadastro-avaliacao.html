@@ -388,9 +388,9 @@
     </header>
 
     <div class="sidebar">
-        <a href="#">Cadastro Paciente</a>
-        <a href="#">Cadastro Avaliação</a>
-        <a href="#">Desempenho</a>
+        <a href="cadastro-paciente.html">Cadastro Paciente</a>
+        <a href="cadastro-avaliacao.html">Cadastro Avaliação</a>
+        <a href="index.html">Desempenho</a>
     </div>
 
     <div class="container-fluid">
@@ -405,10 +405,10 @@
                 <select id="nome-paciente-filtro">
                     <option value="" disabled selected>Selecione o Nome do Paciente</option>
                 </select>
-                <input type="text" name="nome-avaliacao" id="nome-avaliacao" placeholder="CPF Paciente">
+                <input type="text" name="nome-avaliacao-filtro" id="nome-avaliacao-filtro" placeholder="Nome">
 
                 <div class="product-buttons">
-                    <button class="btn-action" onclick="buscarPacientes()">Buscar</button>
+                    <button class="btn-action" onclick="buscarAvaliacoes()">Buscar</button>
                     <button class="btn-action" onclick="abrirModal()">Cadastrar</button>
                 </div>
 
@@ -435,10 +435,10 @@
                     </select>
                     <input type="text" name="nome-avaliacao" id="nome-avaliacao" placeholder="Nome Avaliação">
                     <select id="tipo-jogo">
-                        <option value="1" >Memória X</option>
-                        <option value="2" >Memória Y</option>
-                        <option value="3" >Memória Z</option>
-                        <option value="4" >Memória Q</option>
+                        <option value="1">Memória X</option>
+                        <option value="2">Memória Y</option>
+                        <option value="3">Memória Z</option>
+                        <option value="4">Memória Q</option>
                     </select>
                     <textarea name="observacao" id="observacao" placeholder="Observação"></textarea>
                     <button class="btn-save" id="btn-save" onclick="cadastrarAvaliacao()">Salvar</button>
@@ -506,6 +506,34 @@
 
             buscarPacientes();
 
+            function buscarAvaliacoes() {
+                const myHeaders = new Headers();
+                myHeaders.append("access-token", token);
+                myHeaders.append("Content-Type", "application/json");
+
+                const requestOptions = {
+                    method: "GET",
+                    headers: myHeaders
+                };
+
+                fetch(`${URL_API}/avaliacao`, requestOptions)
+                    .then(async (response) => {
+                        const avaliacoes = await response.json()
+                        var temp = "";
+                        avaliacoes.forEach((avaliacao => {
+                            temp += "<tr>";
+                            temp += "<td>" + avaliacao.nm_avaliacao + "</td>";
+                            temp += "<td>" + avaliacao.nm_paciente + "</td>";
+                            temp += "<td>" + avaliacao.tp_status + "</td></tr>";
+                        }));
+                        document.getElementById('lista-avaliacoes').innerHTML = temp;
+                    })
+                    .then((result) => console.log(result))
+                    .catch((error) => console.error(error));
+            }
+
+            buscarAvaliacoes();
+
             function abrirModal() {
                 modal.style.display = "block";
             }
@@ -515,11 +543,12 @@
                 myHeaders.append("access-token", token);
                 myHeaders.append("Content-Type", "application/json");
                 const avaliacao = {};
-                avaliacao.id = 3;
+                avaliacao.id = 33;
                 avaliacao.idPaciente = document.getElementById("nome-paciente").value;
-                avaliacao.status = 'PENDENTE'
-                avaliacao.tipoJogo = document.getElementById("tipo-jogo").value;
-                avaliacao.observacao = document.getElementById("observacao").value;
+                avaliacao.tpStatus = 'PENDENTE'
+                avaliacao.tpJogo = document.getElementById("tipo-jogo").value;
+                avaliacao.dsObservacao = document.getElementById("observacao").value;
+                avaliacao.nomeAvaliacao = document.getElementById("nome-avaliacao").value;
 
                 const requestOptions = {
                     method: "POST",
@@ -530,7 +559,7 @@
                 fetch(`${URL_API}/avaliacao`, requestOptions)
                     .then((response) => {
                         modal.style.display = "none";
-                        
+                        buscarAvaliacoes();
                     })
                     .then((result) => console.log(result))
                     .catch((error) => console.error(error));

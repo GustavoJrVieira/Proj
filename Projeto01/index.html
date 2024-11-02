@@ -223,6 +223,16 @@
                 margin-left: 0;
             }
         }
+
+        .product-list select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -241,9 +251,9 @@
     </header>
 
     <div class="sidebar">
-        <a onclick="cadastroPaciente()">Cadastro Paciente</a>
-        <a href="#">Cadastro Avaliação</a>
-        <a href="#">Desempenho</a>
+        <a href="cadastro-paciente.html">Cadastro Paciente</a>
+        <a href="cadastro-avaliacao.html">Cadastro Avaliação</a>
+        <a href="index.html">Desempenho</a>
     </div>
 
     <div class="container-fluid">
@@ -255,8 +265,10 @@
             </div>
 
             <div class="product-list">
-                <div>
-                    <canvas id="myChart"></canvas>
+                <select id="nome-paciente-filtro" onchange="buscarAvaliacoes()">
+                    <option value="" selected>Selecione o Nome do Paciente</option>
+                </select>
+                <div id="graficos">
                 </div>
                 <!-- Exemplo de produto -->
                 <!-- <div class="product-card">
@@ -314,39 +326,155 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('myChart');
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Jogo X', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    label: 'Evolução',
-                    data: [500, 319, 223, 335, 42,533],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        function cadastroPaciente() {
-            window.location.href = "cadastro-paciente.html";
-        }
-
-        let produtos = [];
-
         // Obtém o token do cookie
         const token = getCookie('token');
         // Se o token não existir ou for expirado, realiza logout
         if (!token || token == "expirado") {
             logout();
         }
+
+        const URL_API = "http://localhost:3002"
+        let avaliacoes = [];
+        function buscarAvaliacoes() {
+            const myHeaders = new Headers();
+            myHeaders.append("access-token", token);
+            myHeaders.append("Content-Type", "application/json");
+
+            const requestOptions = {
+                method: "GET",
+                headers: myHeaders
+            };
+
+            let url = "avaliacao"
+            const idPaciente = document.getElementById("nome-paciente-filtro").value;
+            if (idPaciente) {
+                url += `?idPaciente=${idPaciente}`;
+            }
+
+            fetch(`${URL_API}/${url}`, requestOptions)
+                .then(async (response) => {
+                    avaliacoes = await response.json()
+
+                    const graficos = document.getElementById("graficos");
+                    graficos.innerHTML = ''
+
+                    var canvas = document.createElement('canvas');
+                    canvas.id = "myChart"
+                    canvas.setAttribute('width', 400);
+                    canvas.setAttribute('height', 150);
+
+                    graficos.appendChild(canvas);
+                    canvas = document.createElement('canvas');
+                    canvas.id = "myChart2"
+                    canvas.setAttribute('width', 400);
+                    canvas.setAttribute('height', 150);
+
+                    graficos.appendChild(canvas);
+                    canvas = document.createElement('canvas');
+                    canvas.id = "myChart3"
+                    canvas.setAttribute('width', 400);
+                    canvas.setAttribute('height', 150);
+                    
+                    graficos.appendChild(canvas);
+
+                    const ctx = document.getElementById('myChart');
+                    const ctx2 = document.getElementById('myChart2');
+                    const ctx3 = document.getElementById('myChart3');
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: avaliacoes.map(avaliacao => { return avaliacao.nm_paciente }),
+                            datasets: [{
+                                label: 'Pontuação',
+                                data: avaliacoes.map(avaliacao => { return avaliacao.nr_potuacao }),
+                                borderWidth: 1,
+                                backgroundColor: 'gray'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    new Chart(ctx2, {
+                        type: 'line',
+                        data: {
+                            labels: avaliacoes.map(avaliacao => { return avaliacao.tp_jogo }),
+                            datasets: [{
+                                label: 'Evolução Por Jogo',
+                                data: avaliacoes.map(avaliacao => { return avaliacao.nr_potuacao }),
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    new Chart(ctx3, {
+                        type: 'line',
+                        data: {
+                            labels: avaliacoes.map(avaliacao => { return avaliacao.nm_paciente }),
+                            datasets: [{
+                                label: 'Tempo',
+                                data: avaliacoes.map(avaliacao => { return avaliacao.qt_tempo }),
+                                borderWidth: 1,
+                                backgroundColor: 'red'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .then((result) => console.log(result))
+                .catch((error) => console.error(error));
+        }
+        buscarAvaliacoes();
+
+        function buscarPacientes() {
+            const nomePaciente = document.getElementById("nome-paciente-filtro");
+            const cpfPaciente = document.getElementById("cpf-paciente-filtro");
+
+            const myHeaders = new Headers();
+            myHeaders.append("access-token", token);
+            myHeaders.append("Content-Type", "application/json");
+
+            const requestOptions = {
+                method: "GET",
+                headers: myHeaders
+            };
+
+            fetch(`${URL_API}/paciente`, requestOptions)
+                .then(async (response) => {
+                    const pacientes = await response.json()
+                    const selectPaciente = document.getElementById("nome-paciente-filtro");
+                    pacientes.forEach(paciente => {
+                        const option = document.createElement("option");
+                        option.value = paciente.id; // Valor do ID ou outro identificador
+                        option.textContent = paciente.nm_paciente; // Nome do paciente exibido na lista
+                        selectPaciente.appendChild(option);
+                    });
+                })
+                .then((result) => console.log(result))
+                .catch((error) => console.error(error));
+        }
+
+        buscarPacientes();
+
 
         // Exibe o nome do usuário no span
         var span = document.getElementById('nome-usuario'),
