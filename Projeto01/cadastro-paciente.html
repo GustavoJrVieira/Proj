@@ -468,6 +468,8 @@
                         const pacientes = await response.json()
                         var temp = "";
                         pacientes.forEach((paciente => {
+
+                        
                             temp += "<tr>";
                             temp += "<td>" + paciente.nm_paciente + "</td>";
                             temp += "<td>" + paciente.dt_nascimento + "</td>";

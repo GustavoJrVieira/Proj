@@ -260,7 +260,7 @@
         <div class="main-content">
             <div class="add-section">
                 <div class="product-title">
-                    Dashboard
+                    Desempenho(s)
                 </div>
             </div>
 
@@ -384,9 +384,9 @@
                     new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: avaliacoes.map(avaliacao => { return avaliacao.nm_paciente }),
+                            labels: avaliacoes.map(avaliacao => { return avaliacao.nm_avaliacao }),
                             datasets: [{
-                                label: 'Pontuação',
+                                label: 'Pontuação por avaliacao',
                                 data: avaliacoes.map(avaliacao => { return avaliacao.nr_potuacao }),
                                 borderWidth: 1,
                                 backgroundColor: 'gray'

@@ -403,9 +403,11 @@
 
             <div class="product-list">
                 <select id="nome-paciente-filtro">
-                    <option value="" disabled selected>Selecione o Nome do Paciente</option>
+                    <option value="" disabled selected>Selecione o paciente </option>
                 </select>
-                <input type="text" name="nome-avaliacao-filtro" id="nome-avaliacao-filtro" placeholder="Nome">
+                <select id="nome-paciente-filtro">
+                    <option value="" disabled selected>Selecione a avaliacao</option>
+                </select>
 
                 <div class="product-buttons">
                     <button class="btn-action" onclick="buscarAvaliacoes()">Buscar</button>
@@ -431,11 +433,11 @@
                     <span class="close">&times;</span>
                     <h2>Cadastro Paciente</h2>
                     <select id="nome-paciente">
-                        <option value="" disabled selected>Selecione o Nome do Paciente</option>
+                        <option value="" disabled selected>Selecione o paciente</option>
                     </select>
-                    <input type="text" name="nome-avaliacao" id="nome-avaliacao" placeholder="Nome Avaliação">
+                    <input type="text" name="nome-avaliacao" id="nome-avaliacao" placeholder="Nome avaliação">
                     <select id="tipo-jogo">
-                        <option value="1">Memória X</option>
+                        <option value="1">Jogos</option>
                         <option value="2">Memória Y</option>
                         <option value="3">Memória Z</option>
                         <option value="4">Memória Q</option>
